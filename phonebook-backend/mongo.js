@@ -11,6 +11,7 @@ mongoose.connect(url).then((result) => console.log("connected"));
 const personSchema = mongoose.Schema({
   name: {
     type: "string",
+    minLength: 3,
   },
   number: {
     type: "string",

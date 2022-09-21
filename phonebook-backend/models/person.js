@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const url = process.env.MONGODB_URI;
+const regexTest = /^\d{2,3}[-]?\d{5,}$/im;
 
 mongoose
   .connect(url)
@@ -16,6 +17,11 @@ const personSchema = new mongoose.Schema({
   number: {
     type: String,
     required: true,
+    validate: {
+      validator: (value) =>
+        value.split("-").join("").length >= 8 && regexTest.test(value),
+      message: (props) => `${props.value} is not a valid phone number!`,
+    },
   },
 });
 
