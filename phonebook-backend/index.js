@@ -1,8 +1,8 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const cors = require("cors");
 const morgan = require("morgan");
-require("dotenv").config();
 
 // Model
 const Person = require("./models/person");
@@ -56,29 +56,6 @@ app.delete("/api/persons/:id", (req, res, next) => {
     .catch((error) => next(error));
 });
 
-app.post("/api/persons", (req, res, next) => {
-  const newPerson = req.body;
-  Person.findOne({ name: newPerson.name })
-    .then((person) => {
-      let isNameExisting =
-        person && person.name.toLowerCase() === newPerson.name.toLowerCase();
-      if (isNameExisting) {
-        res.status(404).send({ error: "name must be unique" }).end();
-      } else {
-        const person = new Person({
-          name: newPerson.name,
-          number: newPerson.number,
-        });
-        person.save().then((result) => {
-          res.json(result);
-        });
-      }
-    })
-    .catch((error) => {
-      next(error);
-    });
-});
-
 app.put("/api/persons/:id", (req, res, next) => {
   const { name, number } = req.body;
   {
@@ -94,6 +71,30 @@ app.put("/api/persons/:id", (req, res, next) => {
   }
 });
 
+app.post("/api/persons", (req, res, next) => {
+  const newPerson = req.body;
+  Person.findOne({ name: newPerson.name })
+    .then((person) => {
+      let isNameExisting =
+        person && person.name.toLowerCase() === newPerson.name.toLowerCase();
+      if (isNameExisting) {
+        res.status(404).send({ error: "name must be unique" }).end();
+      } else {
+        const person = new Person({
+          name: newPerson.name,
+          number: newPerson.number,
+        });
+        person
+          .save()
+          .then((result) => {
+            res.json(result);
+          })
+          .catch((error) => next(error));
+      }
+    })
+    .catch((error) => next(error));
+});
+
 // Error and unknown endpoints middlewares
 const unknownEndpoint = (req, res) => {
   res.status(404).send({ error: "unknown endpoint" });
@@ -101,11 +102,9 @@ const unknownEndpoint = (req, res) => {
 app.use(unknownEndpoint);
 
 const errorHandler = (error, req, res, next) => {
-  console.log(error, "null");
   if (error.name === "CastError") {
     return res.status(400).send({ error: "malformatted id" });
   } else if (error.name === "ValidationError") {
-    console.log("errorrrrrrr");
     return res.status(400).json({ error: error.message });
   }
   next(error);
