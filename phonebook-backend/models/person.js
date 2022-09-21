@@ -5,7 +5,7 @@ const regexTest = /^\d{2,3}[-]?\d{5,}$/im;
 
 mongoose
   .connect(url)
-  .then((result) => console.log("connected"))
+  .then(() => console.log("connected"))
   .catch((err) => console.log(err));
 
 const personSchema = new mongoose.Schema({

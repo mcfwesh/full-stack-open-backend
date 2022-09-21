@@ -6,7 +6,7 @@ const name = process.argv[3];
 const number = process.argv[4];
 const url = `mongodb+srv://mcfwesh:${password}@cluster0.glqig1z.mongodb.net/phonebook-database?retryWrites=true&w=majority`;
 
-mongoose.connect(url).then((result) => console.log("connected"));
+mongoose.connect(url).then(() => console.log("connected"));
 
 const personSchema = mongoose.Schema({
   name: {

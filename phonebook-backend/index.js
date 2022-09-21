@@ -11,11 +11,11 @@ const Person = require("./models/person");
 app.use(express.static("build"));
 app.use(express.json());
 app.use(cors());
-morgan.token("body", (req, res) => JSON.stringify(req.body));
+morgan.token("body", (req) => JSON.stringify(req.body));
 app.use(morgan(":method :url :status - :response-time ms :body"));
 
 // Routes
-app.get("/api/persons", (req, res) => {
+app.get("/api/persons", (req, res, next) => {
   Person.find()
     .then((persons) => {
       res.json(persons);
@@ -23,7 +23,7 @@ app.get("/api/persons", (req, res) => {
     .catch((error) => next(error));
 });
 
-app.get("/info", (req, res) => {
+app.get("/info", (req, res, next) => {
   Person.find()
     .then((persons) => {
       const html = `<div>Phonebook has info for ${
@@ -50,7 +50,7 @@ app.get("/api/persons/:id", (req, res, next) => {
 
 app.delete("/api/persons/:id", (req, res, next) => {
   Person.findByIdAndRemove(req.params.id)
-    .then((result) => {
+    .then(() => {
       res.status(204).end();
     })
     .catch((error) => next(error));
